@@ -10,10 +10,13 @@ export const getRepositoriesSuccess = createStandardAction('GET_REPOSITORIES_SUC
 export const getRepositoriesError = createStandardAction('GET_REPOSITORIES_ERROR')<string>();
 
 
-export function getRepositories(subject: string) {
+export function getRepositories(subject: string, page: number) {
   return (dispatch: Dispatch<any>) => {
+    if (subject === '') {
+      return {}
+    }
     dispatch(getRepositoriesPending());
-    return getRepository(subject)
+    return getRepository(subject, page)
       .then(results => {
         dispatch(getRepositoriesSuccess(results));
       })
@@ -21,5 +24,13 @@ export function getRepositories(subject: string) {
         dispatch(getRepositoriesError(error.message));
         throw error;
       });
+  };
+}
+
+export const resetStateAction = createStandardAction('RESET_STATE')<void>();
+
+export function resetState() {
+  return (dispatch: Dispatch<any>) => {
+    dispatch(resetStateAction());
   };
 }

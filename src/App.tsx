@@ -1,8 +1,10 @@
 import React, { PureComponent } from 'react';
-import { connect } from "react-redux";
-import { Dispatch, bindActionCreators } from "redux";
-import { getRepositories } from "./actions/requests";
-import { debounce } from "throttle-debounce";
+import { connect } from 'react-redux';
+import { Dispatch, bindActionCreators } from 'redux';
+import { getRepositories, resetState } from './actions/requests';
+import { debounce } from 'throttle-debounce';
+import DrawRepository from './components/DrawRepository/DrawRepository';
+import Buttons from './components/Buttons/Buttons';
 import './App.scss';
 
 interface OwnProps { }
@@ -12,7 +14,7 @@ interface State {
   subject?: string;
 }
 
-class App extends PureComponent<Props, State>{
+class App extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -21,40 +23,45 @@ class App extends PureComponent<Props, State>{
   }
 
   onSuggestionsFetchRequested = debounce(1000, (q: string) => {
-    this.props.getRepositories(q);
+    this.props.getRepositories(q, 1);
   });
 
   componentDidUpdate() {
-    console.log(this.state.subject)//если тут пусто очистить стейт
     if (this.state.subject) {
       this.onSuggestionsFetchRequested(this.state.subject);
+    }
+    if (this.state.subject === '') {
+      this.props.resetState()
+      this.onSuggestionsFetchRequested('');
     }
   }
 
   handleInputChange = (e: React.ChangeEvent<HTMLInputElement> & React.SyntheticEvent): void => {
     e.persist();
-    this.setState((prevState) => ({ subject: e.target.value }));
-
+    this.setState((state) => ({ subject: e.target.value }));
   }
+
 
   render() {
     const { subject } = this.state;
     return (
-      <div className="app">
+      <div className='app'>
         <input
           type='text'
           onChange={this.handleInputChange}
           className='app__subject'
           value={subject}
-          placeholder="Введите название репозитория"
+          placeholder='Введите название репозитория'
         />
+        <Buttons subject={this.state.subject} />
+        <DrawRepository />
       </div>);
   }
 }
 
-
 const mapDispatchToProps = (dispatch: Dispatch) => bindActionCreators({
-  getRepositories
+  getRepositories,
+  resetState
 }, dispatch)
 
 type DispatchFromProps = ReturnType<typeof mapDispatchToProps>;

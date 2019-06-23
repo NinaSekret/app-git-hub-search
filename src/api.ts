@@ -29,6 +29,6 @@ function request<R extends object>(
     .then(response => response.json());
 }
 
-export function getRepository(subject: string) {
-  return request<Repositories>(`${subject}`, "GET");
+export function getRepository(subject: string, page: number) {
+  return request<Repositories>(`${subject}&page=${page}`, "GET");
 }

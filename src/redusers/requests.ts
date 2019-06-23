@@ -38,10 +38,12 @@ export default function reducer(
             watchers: item.watchers
           }
         }),
-        isloading: true,
+        isloading: false,
       };
     case getType(actions.getRepositoriesError):
       return { ...state, isloading: false, error: action.payload };
+    case getType(actions.resetStateAction):
+      return initialState;
     default:
       return state;
   }
